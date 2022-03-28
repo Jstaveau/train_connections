@@ -14,7 +14,7 @@ function App() {
   let dd = date.getDate().toString();
   dd < 10 ? dd = "0" + dd : dd = dd
 
-  let mm = date.getMonth().toString();
+  let mm = (date.getMonth()+1).toString();
   mm < 10 ? mm = "0" + mm : mm = mm
 
   let yy = date.getFullYear().toString().slice(2);
@@ -27,7 +27,6 @@ function App() {
   hh < 10 ? hh = "0" + hh : hh = hh
   min < 10 ? min = "0" + min : min = min
   let hour = hh + min
-
 
   //getTime to get the average of delay, ...
   let dateTime = date.getTime()
