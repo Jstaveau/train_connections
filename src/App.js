@@ -36,7 +36,7 @@ function App() {
   useEffect(() => {
     const dateInterval = setInterval(() => {
         setDate(new Date())
-    }, 10000);
+    }, 300000);
 
     return () => {
         clearInterval(dateInterval)
@@ -44,52 +44,114 @@ function App() {
 
   //getAPIs & average train current hour
   const [averageNivelle, setAverageNivelle] = useState(0)
+  const [delayNivelle, setDelayNivelle] = useState(0)
+  const [averageCharleroi, setAverageCharleroi] = useState(0)
+  const [delayCharleroi, setDelayCharleroi] = useState(0)
+  const [pastNivelles, setPastNivelles] = useState()
+  const [pastCharleroi, setPastCharleroi] = useState()
+  let canceledCharleroi = 0
+  let canceledNivelles = 0
+
   useEffect(() => {
     fetch('https://api.irail.be/connections/?from=charleroi-sud&to=nivelles&format=json&date=' + dateURL + '&time=' + hour)
     .then(response => response.json())
     .then(data => {
-        setNivelles(data)
+        setCharleroi(data)
     })
     fetch('https://api.irail.be/connections/?from=nivelles&to=charleroi-sud&format=json&date=' + dateURL + '&time=' + hour)
     .then(response => response.json())
     .then(data => {
-        setCharleroi(data)
+        setNivelles(data)
     })
-    // average
-    console.log(nivelles.connection.length);
+
+    //api 2 hours before
+    if (hour < 200) {
+      hour += 2200 
+    }
+    fetch('https://api.irail.be/connections/?from=charleroi-sud&to=nivelles&format=json&date=' + dateURL + '&time=' + (hour - 200))
+    .then(response => response.json())
+    .then(data => {
+        setPastCharleroi(data)
+    })
+    fetch('https://api.irail.be/connections/?from=nivelles&to=charleroi-sud&format=json&date=' + dateURL + '&time=' + (hour-200))
+    .then(response => response.json())
+    .then(data => {
+        setPastNivelles(data)
+    })
+
+    // average nivelles
     let trainsNivelles = nivelles.connection.length
     let ridingTrainNivelle = 0;
     nivelles.connection.forEach(e => {
       if (dateTime + 3600000 >= e.departure.time * 1000) {
         ridingTrainNivelle += 1
-        console.log(new Date(e.departure.time * 1000).getTime());
-        console.log(dateTime);
       }
     });
-    setAverageNivelle(ridingTrainNivelle/trainsNivelles * 100)
+    setAverageNivelle((ridingTrainNivelle/trainsNivelles * 100).toFixed(2))
     
+    //average charleroi
+    let trainsCharleroi = charleroi.connection.length
+    let ridingTrainCharleroi = 0;
+    charleroi.connection.forEach(e => {
+      if (dateTime + 3600000 >= e.departure.time * 1000) {
+        ridingTrainCharleroi += 1
+      }
+    });
+    setAverageCharleroi((ridingTrainNivelle/trainsCharleroi * 100).toFixed(2))
+    
+    //delay nivelles
+    let delayTrainNivelle = 0
+    nivelles.connection.forEach(e => {
+      if (dateTime + 3600000 >= e.departure.time * 1000 && (e.departure.delay > 0)) {
+        delayTrainNivelle += parseInt(e.departure.delay)
+      }
+    });
+    let delayRawNivelles = delayTrainNivelle/trainsNivelles
+
+    //delay charleroi
+    let delayTrainCharleroi = 0
+    charleroi.connection.forEach(e => {
+      if (dateTime + 3600000 >= e.departure.time * 1000 && (e.departure.delay > 0)) {
+        delayTrainCharleroi += parseInt(e.departure.delay)
+      }
+    });
+    let delayRawCharleroi = delayTrainCharleroi/trainsCharleroi
+
+    //function format delay
+    const formatDelay = (delay) => {
+      let hourDelay = new Date(delay * 1000)
+      return hourDelay.getMinutes()
+    }
+    setDelayNivelle(formatDelay(delayRawNivelles))
+    setDelayCharleroi(formatDelay(delayRawCharleroi))
+    
+
+    //canceled train 2 last hours
+    canceledCharleroi = 0
+    canceledNivelles = 0
+    pastCharleroi.connection.forEach(e => {
+      if (e.departure.canceled != "0") {
+        canceledCharleroi += 1
+      }
+    });
+    pastNivelles.connection.forEach(e => {
+      if (e.departure.canceled != "0") {
+        canceledNivelles += 1
+      }
+    });
+
+
     
   }, [date])
 
-  
-  
-  
-
-
-
   return (
     <div className="App">
-      <p>Pourcentage de train en marche durant la prochaine heure : {averageNivelle} %</p>
+      <p>Pourcentage de train en marche durant la prochaine heure : {averageNivelle} % & {averageCharleroi} %</p>
+      <p>Retards nivelle : {delayNivelle}min</p>
+      <p>Retards Charleroi : {delayCharleroi}min</p>
+      <p>Trains annulés Nivelles: {canceledNivelles}</p>
+      <p>Trains annulés Charleroi : {canceledCharleroi}</p>
       <h1>{dd + "/"+ mm + "/"+ yy} = {dateTime} heure = {hour}</h1>
-            {nivelles &&
-                nivelles.connection.map(item =>{
-                    return <p>{item.departure.station}</p>
-                })}
-            <h1>{dd + "/"+ mm + "/"+ yy} = {dateTime} </h1>
-            {charleroi &&
-                charleroi.connection.map(item =>{
-                    return <p>{item.departure.station}</p>
-                })}
     </div>
   );
 }
