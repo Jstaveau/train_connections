@@ -122,25 +122,10 @@ function App() {
     setAverageCharleroi(average(charleroi))
     
     //delay nivelles
-
-    // let delayTrainNivelle = 0
-    // nivelles.connection.forEach(e => {
-    //   if (dateTime + 3600000 >= e.departure.time * 1000 && (e.departure.delay > 0)) {
-    //     delayTrainNivelle += parseInt(e.departure.delay)
-    //   }
-    // });
-    // let delayRawNivelles = delayTrainNivelle/trainsNivelles
     setDelayRawNivelles(delay(nivelles))
 
 
     //delay charleroi
-    // let delayTrainCharleroi = 0
-    // charleroi.connection.forEach(e => {
-    //   if (dateTime + 3600000 >= e.departure.time * 1000 && (e.departure.delay > 0)) {
-    //     delayTrainCharleroi += parseInt(e.departure.delay)
-    //   }
-    // });
-    // let delayRawCharleroi = delayTrainCharleroi/trainsCharleroi
     setDelayRawCharleroi(delay(charleroi))
 
 
