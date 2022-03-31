@@ -37,7 +37,7 @@ function App() {
   useEffect(() => {
     const dateInterval = setInterval(() => {
         setDate(new Date())
-    }, 300000);
+    }, 3000);
 
     return () => {
         clearInterval(dateInterval)
@@ -101,17 +101,18 @@ function App() {
     })
 
     //api 2 hours before
-    if (hour < 200) {
-      hour += 2200 
+    let hourMin2 = hour
+    if (hourMin2 < 200) {
+      hourMin2 += 2200 
     } else if (hour < 1000) {
-      hour = '0' + (hh - 2).toString() + min 
+      hourMin2 = '0' + (hh - 2).toString() + min 
     }
-    fetch('https://api.irail.be/connections/?from=charleroi-sud&to=nivelles&format=json&date=' + dateURL + '&time=' + hour)
+    fetch('https://api.irail.be/connections/?from=charleroi-sud&to=nivelles&format=json&date=' + dateURL + '&time=' + hourMin2)
     .then(response => response.json())
     .then(data => {
         setPastCharleroi(data)
     })
-    fetch('https://api.irail.be/connections/?from=nivelles&to=charleroi-sud&format=json&date=' + dateURL + '&time=' + hour)
+    fetch('https://api.irail.be/connections/?from=nivelles&to=charleroi-sud&format=json&date=' + dateURL + '&time=' + hourMin2)
     .then(response => response.json())
     .then(data => {
         setPastNivelles(data)
