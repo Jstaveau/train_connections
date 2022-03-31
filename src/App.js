@@ -59,27 +59,27 @@ function App() {
   //functions
   //average
   const average = (ville) => {
-    let trainsNivelles = ville.connection.length
-    let ridingTrainNivelle = 0;
+    let allTrains = ville.connection.length
+    let ridingTrains = 0;
     ville.connection.forEach(e => {
       if (dateTime + 3600000 >= e.departure.time * 1000) {
-        ridingTrainNivelle += 1
+        ridingTrains += 1
       }
     });
-    let result = (ridingTrainNivelle/trainsNivelles * 100).toFixed()
+    let result = (ridingTrains/allTrains * 100).toFixed()
     return result
   }
   //delay
   const delay = (ville) => {
-    let trainsNivelles = ville.connection.length
-    let delayTrainNivelle = 0
+    let allTrains = ville.connection.length
+    let delayTrains = 0
     ville.connection.forEach(e => {
       if (dateTime + 3600000 >= e.departure.time * 1000 && e.departure.delay > 0) {
-        delayTrainNivelle += parseInt(e.departure.delay)
+        delayTrains += parseInt(e.departure.delay)
         }
     });
-    let delayRawNivelles = delayTrainNivelle/trainsNivelles
-    return parseInt(delayRawNivelles)
+    let delayRaw = delayTrains/allTrains
+    return parseInt(delayRaw)
   }
   //format delay
   const formatDelay = (delay) => {
