@@ -37,7 +37,7 @@ function App() {
   useEffect(() => {
     const dateInterval = setInterval(() => {
         setDate(new Date())
-    }, 1000);
+    }, 300000);
 
     return () => {
         clearInterval(dateInterval)
@@ -66,7 +66,7 @@ function App() {
         ridingTrainNivelle += 1
       }
     });
-    let result = (ridingTrainNivelle/trainsNivelles * 100).toFixed(2)
+    let result = (ridingTrainNivelle/trainsNivelles * 100).toFixed()
     return result
   }
   //delay
@@ -74,7 +74,7 @@ function App() {
     let trainsNivelles = ville.connection.length
     let delayTrainNivelle = 0
     ville.connection.forEach(e => {
-      if (dateTime + 3600000 >= e.departure.time * 1000 && (e.departure.delay > 0)) {
+      if (dateTime + 3600000 >= e.departure.time * 1000 && e.departure.delay > 0) {
         delayTrainNivelle += parseInt(e.departure.delay)
         }
     });
@@ -103,13 +103,15 @@ function App() {
     //api 2 hours before
     if (hour < 200) {
       hour += 2200 
+    } else if (hour < 1000) {
+      hour = '0' + (hh - 2).toString() + min 
     }
-    fetch('https://api.irail.be/connections/?from=charleroi-sud&to=nivelles&format=json&date=' + dateURL + '&time=' + (hour - 200))
+    fetch('https://api.irail.be/connections/?from=charleroi-sud&to=nivelles&format=json&date=' + dateURL + '&time=' + hour)
     .then(response => response.json())
     .then(data => {
         setPastCharleroi(data)
     })
-    fetch('https://api.irail.be/connections/?from=nivelles&to=charleroi-sud&format=json&date=' + dateURL + '&time=' + (hour-200))
+    fetch('https://api.irail.be/connections/?from=nivelles&to=charleroi-sud&format=json&date=' + dateURL + '&time=' + hour)
     .then(response => response.json())
     .then(data => {
         setPastNivelles(data)
